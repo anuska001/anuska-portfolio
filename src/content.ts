@@ -346,10 +346,11 @@ export const portfolioContent: PortfolioContent = {
   // 6. CONTACT LINKS & RESUME
   contact: {
     email: "mukherjeeanuska01@gmail.com",
+    phone: "+91 90516 15043", 
     linkedin: "https://www.linkedin.com/in/anuska-mukherjee-1b1671190/",
     github: "https://github.com/anuska001",
     resumeUrl: "#", // Replace with your Google Drive, Dropbox, or hosted PDF link
     location: "Available Globally / Remote",
-    availabilityNote: "Actively interviewing for Associate Product Manager (APM) and Product Manager roles. Always happy to connect!",
+    availabilityNote: "Actively interviewing for Associate Product Manager and Product Intern roles. Always happy to connect!",
   },
 };

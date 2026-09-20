@@ -43,6 +43,7 @@ export interface SkillCategory {
 
 export interface ContactInfo {
   email: string;
+  phone?: string;
   linkedin: string;
   github: string;
   resumeUrl: string;
