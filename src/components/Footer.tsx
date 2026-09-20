@@ -13,9 +13,6 @@ export function Footer() {
           <p className="text-[#EDE9E1] font-medium tracking-wide">
             © {new Date().getFullYear()} {portfolioContent.personal.name}. All rights reserved.
           </p>
-          <p className="text-[#736F68] mt-1 font-mono text-[11px]">
-            Designed with quiet craftsmanship & product focus.
-          </p>
         </div>
 
         <div className="flex items-center gap-6">
