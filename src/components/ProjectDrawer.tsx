@@ -87,14 +87,14 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
           aria-label="Close project panel backdrop"
         />
 
-        {/* Right-side Sliding Drawer: near-black (#0E0E11), 1px gold/subtle border, ~50% width on desktop */}
+        {/* Right-side Sliding Drawer: near-black (#0E0E11), 1px gold/subtle border, 60% width on desktop */}
         <motion.aside
           id="project-drawer-panel"
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="relative z-50 w-full md:w-[54%] lg:w-[50%] xl:w-[48%] h-full bg-[#0E0E11] text-[#EDE9E1] border-l border-[#ceb573]/20 shadow-[0_0_50px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden"
+          className="relative z-50 w-full md:w-[60%] lg:w-[60%] xl:w-[60%] h-full bg-[#0E0E11] text-[#EDE9E1] border-l border-[#ceb573]/20 shadow-[0_0_50px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden"
           role="dialog"
           aria-modal="true"
           aria-labelledby="drawer-project-title"
