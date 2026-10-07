@@ -23,6 +23,7 @@ export interface Project {
   tags: string[];
   links: ProjectLink[];
   sections: CaseStudySection[];
+  pdfUrl?: string;
 }
 
 export interface JourneyItem {

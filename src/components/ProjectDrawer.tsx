@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { X, ChevronDown, ChevronUp, ExternalLink, Github, Figma, Play, Layers } from 'lucide-react';
+import { X, ChevronDown, ChevronUp, ExternalLink, Github, Figma, Play, Layers, FileText } from 'lucide-react';
 import { Project, ProjectLink } from '../types';
+import { PdfViewer } from './PdfViewer';
 
 interface ProjectDrawerProps {
   project: Project | null;
@@ -72,6 +73,14 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
     }
   };
 
+  // Resolve PDF file path (located inside case-studies/ folder)
+  const pdfFilename = project.pdfUrl;
+  const cleanPdfName = pdfFilename ? pdfFilename.replace(/^case-studies\//, '') : '';
+  const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
+  const pdfSrc = cleanPdfName ? `${baseUrl}case-studies/${encodeURIComponent(cleanPdfName)}` : '';
+
   return (
     <AnimatePresence>
       <div id="project-drawer-root" className="fixed inset-0 z-50 flex justify-end">
@@ -119,7 +128,7 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
           </div>
 
           {/* Scrollable Case Study Body */}
-          <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-8 space-y-8">
+          <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-8 space-y-8 overscroll-contain scroll-smooth">
             {/* Title & Tagline */}
             <div>
               <h2
@@ -161,13 +170,13 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
             </div>
 
             {/* Project Artifacts & Links */}
-            {project.links && project.links.length > 0 && (
+            {((project.links && project.links.length > 0) || pdfFilename) && (
               <div className="pt-2">
                 <span className="block text-xs uppercase font-mono tracking-[0.15em] text-[#ceb573] mb-3">
                   Project Artifacts & Links
                 </span>
                 <div className="flex flex-wrap gap-2">
-                  {project.links.map((link, idx) => (
+                  {project.links?.map((link, idx) => (
                     <a
                       key={idx}
                       href={link.url}
@@ -179,9 +188,65 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
                       <span>{link.label}</span>
                     </a>
                   ))}
+
+                  {/* Moved Open in New Tab button up under Project Artifacts & Links */}
+                  {pdfFilename && (
+                    <a
+                      href={pdfSrc}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-[#EDE9E1] bg-[#16161B] border border-white/[0.08] hover:border-[#ceb573]/50 hover:text-[#ceb573] transition-all duration-200 cursor-pointer"
+                      title="Open PDF in a new tab"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Open in New Tab</span>
+                    </a>
+                  )}
                 </div>
               </div>
             )}
+
+            {/* Embedded Case Study PDF Document Section / Reserved PDF Space */}
+            <div id="project-drawer-pdf-section" className="pt-2">
+              {pdfFilename ? (
+                /* Pure Canvas PDF Viewer (Brave & Chrome sandbox safe, responsive & scrollable) */
+                <PdfViewer url={pdfSrc} title={project.title} />
+              ) : (
+                /* Reserved placeholder space for project case study presentation */
+                <div className="relative border border-dashed border-[#ceb573]/25 hover:border-[#ceb573]/40 bg-[#16161B]/60 rounded-xl p-8 sm:p-10 flex flex-col items-center justify-center text-center transition-all duration-200">
+                  <div className="w-12 h-12 rounded-full bg-[#ceb573]/10 border border-[#ceb573]/20 flex items-center justify-center text-[#ceb573] mb-3">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs uppercase font-mono tracking-[0.15em] text-[#ceb573] font-medium">
+                    Case Study Presentation (PDF)
+                  </span>
+                  <h4 className="text-sm sm:text-base font-serif text-[#EDE9E1] mt-1 font-normal">
+                    Presentation Space Reserved
+                  </h4>
+                  <p className="text-xs text-[#8A857D] max-w-md mt-1 leading-relaxed">
+                    Upload your presentation slides to{' '}
+                    <code className="text-[#ceb573] bg-black/40 px-1.5 py-0.5 rounded font-mono text-[11px]">
+                      case-studies/
+                    </code>{' '}
+                    and specify{' '}
+                    <code className="text-[#ceb573] bg-black/40 px-1.5 py-0.5 rounded font-mono text-[11px]">
+                      pdfUrl
+                    </code>{' '}
+                    in{' '}
+                    <code className="text-[#ceb573] bg-black/40 px-1.5 py-0.5 rounded font-mono text-[11px]">
+                      content.ts
+                    </code>{' '}
+                    to showcase it here.
+                  </p>
+                  <div className="mt-4 flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono text-[#8A857D] bg-white/[0.03] border border-white/[0.06]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#ceb573]/60 animate-pulse" />
+                      Awaiting PDF upload
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Case Study Sections Header & Expand All Toggle */}
             <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between">

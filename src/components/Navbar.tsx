@@ -83,9 +83,9 @@ export function Navbar({ activeSection, onNavigate }: NavbarProps) {
             href={portfolioContent.contact.resumeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wider uppercase text-[#ceb573] border border-[#ceb573]/30 hover:border-[#ceb573] hover:bg-[#ceb573] hover:text-[#0B0B0D] transition-all duration-200"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-mono tracking-wider uppercase font-semibold text-[#ceb573] border-2 border-[#ceb573]/50 hover:border-[#ceb573] hover:bg-[#ceb573] hover:text-[#0B0B0D] hover:shadow-[0_0_20px_rgba(206,181,115,0.35)] transition-all duration-200"
           >
-            <FileText className="w-3.5 h-3.5" />
+            <FileText className="w-4 h-4" />
             Resume
           </a>
         </div>
