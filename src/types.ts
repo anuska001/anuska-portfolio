@@ -24,6 +24,8 @@ export interface Project {
   links: ProjectLink[];
   sections: CaseStudySection[];
   pdfUrl?: string;
+  driveUrl?: string;
+  defaultPresentation?: 'drive' | 'pdf';
 }
 
 export interface JourneyItem {

@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { X, ChevronDown, ChevronUp, ExternalLink, Github, Figma, Play, Layers, FileText } from 'lucide-react';
 import { Project, ProjectLink } from '../types';
 import { PdfViewer } from './PdfViewer';
+import { GoogleDriveEmbed } from './GoogleDriveEmbed';
+import { getDirectOpenUrl } from '../utils/googleDrive';
 
 interface ProjectDrawerProps {
   project: Project | null;
@@ -11,6 +13,7 @@ interface ProjectDrawerProps {
 
 export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [activePresentationMode, setActivePresentationMode] = useState<'drive' | 'pdf'>('drive');
 
   useEffect(() => {
     if (project) {
@@ -19,6 +22,18 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
         initialOpen[sec.id] = idx < 3;
       });
       setExpandedSections(initialOpen);
+
+      const hasDriveLink = Boolean(project.driveUrl && project.driveUrl.trim() !== '');
+      const hasPdfFile = Boolean(project.pdfUrl && project.pdfUrl.trim() !== '');
+
+      // Default presentation mode: prioritize driveUrl if set, or explicit defaultPresentation
+      if (project.defaultPresentation) {
+        setActivePresentationMode(project.defaultPresentation);
+      } else if (hasDriveLink) {
+        setActivePresentationMode('drive');
+      } else if (hasPdfFile) {
+        setActivePresentationMode('pdf');
+      }
     }
   }, [project]);
 
@@ -75,11 +90,13 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
 
   // Resolve PDF file path (located inside case-studies/ folder)
   const pdfFilename = project.pdfUrl;
-  const cleanPdfName = pdfFilename ? pdfFilename.replace(/^case-studies\//, '') : '';
+  const cleanPdfName = pdfFilename ? pdfFilename.replace(/^case-studies\//, '').trim() : '';
   const baseUrl = import.meta.env.BASE_URL.endsWith('/')
     ? import.meta.env.BASE_URL
     : `${import.meta.env.BASE_URL}/`;
   const pdfSrc = cleanPdfName ? `${baseUrl}case-studies/${encodeURIComponent(cleanPdfName)}` : '';
+  const hasDrive = Boolean(project.driveUrl && project.driveUrl.trim() !== '');
+  const hasPdf = Boolean(cleanPdfName);
 
   return (
     <AnimatePresence>
@@ -170,7 +187,7 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
             </div>
 
             {/* Project Artifacts & Links */}
-            {((project.links && project.links.length > 0) || pdfFilename) && (
+            {(Boolean(project.links && project.links.length > 0) || hasPdf || hasDrive) && (
               <div className="pt-2">
                 <span className="block text-xs uppercase font-mono tracking-[0.15em] text-[#ceb573] mb-3">
                   Project Artifacts & Links
@@ -189,8 +206,22 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
                     </a>
                   ))}
 
+                  {/* Direct Google Drive presentation link */}
+                  {hasDrive && project.driveUrl && (
+                    <a
+                      href={getDirectOpenUrl(project.driveUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-[#ceb573] bg-[#ceb573]/10 border border-[#ceb573]/30 hover:border-[#ceb573] hover:bg-[#ceb573]/20 transition-all duration-200 cursor-pointer shadow-sm"
+                      title="Open Google Drive presentation in a new tab"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Open in Google Drive</span>
+                    </a>
+                  )}
+
                   {/* Moved Open in New Tab button up under Project Artifacts & Links */}
-                  {pdfFilename && (
+                  {hasPdf && (
                     <a
                       href={pdfSrc}
                       target="_blank"
@@ -199,17 +230,57 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
                       title="Open PDF in a new tab"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Open in New Tab</span>
+                      <span>Open PDF in New Tab</span>
                     </a>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Embedded Case Study PDF Document Section / Reserved PDF Space */}
-            <div id="project-drawer-pdf-section" className="pt-2">
-              {pdfFilename ? (
+            {/* Embedded Case Study Presentation Section (Google Drive Embed / PDF / Reserved Space) */}
+            <div id="project-drawer-pdf-section" className="pt-2 space-y-3">
+              {/* If both Drive URL and PDF are available, allow user to toggle between them */}
+              {hasDrive && hasPdf && (
+                <div className="flex items-center justify-between bg-[#16161B] border border-white/[0.08] p-1.5 rounded-lg">
+                  <span className="text-xs font-mono text-[#8A857D] px-2 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#ceb573]" />
+                    Presentation View:
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setActivePresentationMode('drive')}
+                      className={`px-3 py-1 text-xs font-mono rounded-md transition-all cursor-pointer ${
+                        activePresentationMode === 'drive'
+                          ? 'bg-[#ceb573] text-[#0E0E11] font-semibold shadow-sm'
+                          : 'text-[#8A857D] hover:text-[#EDE9E1] hover:bg-white/[0.05]'
+                      }`}
+                    >
+                      Google Drive (Live)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActivePresentationMode('pdf')}
+                      className={`px-3 py-1 text-xs font-mono rounded-md transition-all cursor-pointer ${
+                        activePresentationMode === 'pdf'
+                          ? 'bg-[#ceb573] text-[#0E0E11] font-semibold shadow-sm'
+                          : 'text-[#8A857D] hover:text-[#EDE9E1] hover:bg-white/[0.05]'
+                      }`}
+                    >
+                      Archived PDF
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {hasDrive && activePresentationMode === 'drive' && project.driveUrl ? (
+                <GoogleDriveEmbed url={project.driveUrl} title={project.title} />
+              ) : hasPdf && activePresentationMode === 'pdf' ? (
                 /* Pure Canvas PDF Viewer (Brave & Chrome sandbox safe, responsive & scrollable) */
+                <PdfViewer url={pdfSrc} title={project.title} />
+              ) : hasDrive && project.driveUrl ? (
+                <GoogleDriveEmbed url={project.driveUrl} title={project.title} />
+              ) : hasPdf ? (
                 <PdfViewer url={pdfSrc} title={project.title} />
               ) : (
                 /* Reserved placeholder space for project case study presentation */
@@ -218,17 +289,21 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
                     <FileText className="w-5 h-5" />
                   </div>
                   <span className="text-xs uppercase font-mono tracking-[0.15em] text-[#ceb573] font-medium">
-                    Case Study Presentation (PDF)
+                    Case Study Presentation (Drive or PDF)
                   </span>
                   <h4 className="text-sm sm:text-base font-serif text-[#EDE9E1] mt-1 font-normal">
                     Presentation Space Reserved
                   </h4>
                   <p className="text-xs text-[#8A857D] max-w-md mt-1 leading-relaxed">
-                    Upload your presentation slides to{' '}
+                    Provide a Google Drive / Slides link via{' '}
+                    <code className="text-[#ceb573] bg-black/40 px-1.5 py-0.5 rounded font-mono text-[11px]">
+                      driveUrl
+                    </code>{' '}
+                    or upload a PDF to{' '}
                     <code className="text-[#ceb573] bg-black/40 px-1.5 py-0.5 rounded font-mono text-[11px]">
                       case-studies/
                     </code>{' '}
-                    and specify{' '}
+                    and set{' '}
                     <code className="text-[#ceb573] bg-black/40 px-1.5 py-0.5 rounded font-mono text-[11px]">
                       pdfUrl
                     </code>{' '}
@@ -241,7 +316,7 @@ export function ProjectDrawer({ project, onClose }: ProjectDrawerProps) {
                   <div className="mt-4 flex items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono text-[#8A857D] bg-white/[0.03] border border-white/[0.06]">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#ceb573]/60 animate-pulse" />
-                      Awaiting PDF upload
+                      Awaiting Drive link or PDF upload
                     </span>
                   </div>
                 </div>

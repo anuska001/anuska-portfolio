@@ -55,6 +55,8 @@ export const portfolioContent: PortfolioContent = {
       role: "Product Manager (Case Study)",
       timeline: "Q1 • 4 Weeks",
       status: "Case Study / Concept",
+      driveUrl: "", // Optional: Google Drive or Google Slides presentation link
+      pdfUrl: "", // Optional: PDF filename inside case-studies/ folder
       tags: ["Product Discovery", "User Research", "MVP Scoping", "Wireframing"],
       links: [
         { label: "Prototype", url: "#", type: "prototype" },
@@ -127,7 +129,11 @@ export const portfolioContent: PortfolioContent = {
       role: "Associate PM / Researcher",
       timeline: "Q2 • 6 Weeks",
       status: "In Progress",
+      // Paste your Google Drive / Google Slides link below to embed live presentation slides if desired.
+      // Any changes made in Drive/Slides will update automatically.
+      driveUrl: "https://docs.google.com/presentation/d/1BFJYHd6zsIBeZJ42pU9Qn40I_0DOTxNZ-GbcI8wW6ig/edit?usp=sharing",
       pdfUrl: "n8n Target User Segmentation (1).pdf",
+      defaultPresentation: "pdf",
       tags: ["Competitive Analysis", "User Journey Mapping", "Usability Testing"],
       links: [
         { label: "Prototype", url: "#", type: "prototype" },
@@ -199,6 +205,8 @@ export const portfolioContent: PortfolioContent = {
       role: "Product Strategist",
       timeline: "Q3 • 3 Weeks",
       status: "Concept Spec",
+      driveUrl: "", // Optional: Google Drive or Google Slides presentation link
+      pdfUrl: "", // Optional: PDF filename inside case-studies/ folder
       tags: ["Product Strategy", "Roadmapping", "Feature Architecture"],
       links: [
         { label: "Design File", url: "#", type: "figma" },

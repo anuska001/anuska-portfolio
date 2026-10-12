@@ -11,6 +11,7 @@ if (typeof window !== 'undefined') {
 interface PdfViewerProps {
   url: string;
   title?: string;
+  onError?: (err: Error) => void;
 }
 
 interface PdfPageCanvasProps {
@@ -132,7 +133,7 @@ function PdfPageCanvas({ pdfDoc, pageNum, containerWidth }: PdfPageCanvasProps) 
   );
 }
 
-export function PdfViewer({ url }: PdfViewerProps) {
+export function PdfViewer({ url, onError }: PdfViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
@@ -216,6 +217,7 @@ export function PdfViewer({ url }: PdfViewerProps) {
           console.error('Failed to load PDF document:', err);
           setError(err?.message || 'Failed to load PDF document.');
           setLoading(false);
+          onError?.(err);
         }
       }
     };
