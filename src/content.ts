@@ -128,12 +128,12 @@ export const portfolioContent: PortfolioContent = {
       summary: "This is a placeholder for your second project case study. Use this space to demonstrate a different facet of your PM toolkit, such as growth experimentation, workflow redesign, or B2B SaaS tooling.",
       role: "Associate PM / Researcher",
       timeline: "Q2 • 6 Weeks",
-      status: "In Progress",
-      // Paste your Google Drive / Google Slides link below to embed live presentation slides if desired.
-      // Any changes made in Drive/Slides will update automatically.
+      status: "Done",
+      // Paste your Google Drive / Google Slides link below to embed live presentation slides.
+      // Any changes made in Drive/Slides will update here automatically without re-uploading!
+      // Example: "https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing"
       driveUrl: "https://docs.google.com/presentation/d/1BFJYHd6zsIBeZJ42pU9Qn40I_0DOTxNZ-GbcI8wW6ig/edit?usp=sharing",
-      pdfUrl: "n8n Target User Segmentation (1).pdf",
-      defaultPresentation: "pdf",
+      pdfUrl: "",
       tags: ["Competitive Analysis", "User Journey Mapping", "Usability Testing"],
       links: [
         { label: "Prototype", url: "#", type: "prototype" },
