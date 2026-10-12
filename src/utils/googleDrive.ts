@@ -90,15 +90,55 @@ export function isGoogleDriveService(url: string): boolean {
 }
 
 /**
- * Returns a proxy URL that streams all slides exported as a high-resolution PDF
- * enabling continuous vertical slide stacking without needing next/previous buttons.
+ * Resolves direct Google export URL for Google Slides and Google Drive
+ */
+export function getDirectGooglePdfUrl(rawUrl: string): string | null {
+  const url = extractUrlFromInput(rawUrl);
+  if (!url) return null;
+
+  // Google Slides (presentation/d/{id}/...)
+  const slidesMatch = url.match(/docs\.google\.com\/presentation\/d(?:\/e)?\/([a-zA-Z0-9_-]+)/);
+  if (slidesMatch && slidesMatch[1]) {
+    return `https://docs.google.com/presentation/d/${slidesMatch[1]}/export/pdf`;
+  }
+
+  // Google Drive File (drive.google.com/file/d/{id}/...)
+  const driveFileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://drive.google.com/uc?export=download&id=${driveFileMatch[1]}`;
+  }
+
+  // Query param id
+  const queryMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (queryMatch && queryMatch[1]) {
+    return `https://drive.google.com/uc?export=download&id=${queryMatch[1]}`;
+  }
+
+  return null;
+}
+
+/**
+ * Returns the stream URL for fetching all slides as a PDF.
+ * On static hosting (like GitHub Pages where /api/ does not exist),
+ * it uses Google's direct CORS-enabled PDF export endpoint.
  */
 export function getGoogleDrivePdfStreamUrl(rawUrl: string): string {
   const url = extractUrlFromInput(rawUrl);
   if (!url) return '';
-  const baseUrl = import.meta.env.BASE_URL.endsWith('/')
-    ? import.meta.env.BASE_URL
-    : `${import.meta.env.BASE_URL}/`;
-  return `${baseUrl}api/drive-pdf?url=${encodeURIComponent(url)}`;
+
+  const directUrl = getDirectGooglePdfUrl(url);
+
+  // If running in development with local proxy available, use local proxy;
+  // Otherwise on static sites (like GitHub Pages or production build), use direct Google export!
+  if (import.meta.env.DEV) {
+    const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+      ? import.meta.env.BASE_URL
+      : `${import.meta.env.BASE_URL}/`;
+    return `${baseUrl}api/drive-pdf?url=${encodeURIComponent(url)}`;
+  }
+
+  // In production / GitHub Pages: use direct Google Slides PDF export
+  return directUrl || url;
 }
+
 
